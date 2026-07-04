@@ -1,0 +1,23 @@
+# Star deposit representing an astrophage bloom.
+# Before harvesting tech: it's just the thing killing your star.
+# After tech_astrophage_harvesting: a starbase in the system farms it.
+
+d_astrophage_bloom = {
+	is_for_colonizable = no
+	category = deposit_cat_rare
+	icon = d_energy_10	# TODO: custom icon (gfx/interface/icons/deposits)
+
+	resources = {
+		category = orbital_mining_deposits
+		produces = {
+			trigger = {
+				# Only produces once the exploiting empire has the tech
+				exists = starbase
+				starbase = { exists = owner owner = { has_technology = tech_astrophage_harvesting } }
+			}
+			sr_astrophage = 2
+		}
+	}
+
+	drop_weight = { weight = 0 }	# never spawns naturally; script-placed only
+}

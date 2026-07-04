@@ -1,0 +1,29 @@
+# Scope: galactic_object (system)
+
+# Where can the outbreak START? Avoid homeworlds/fallen empires so
+# an unlucky spawn doesn't delete a player by 2260.
+is_valid_astrophage_seed = {
+	is_valid_astrophage_target = yes
+	NOT = { exists = space_owner }			# start in unclaimed space
+	NOT = { has_star_flag = empire_home_system }
+	# TODO: require min hyperlane distance from all capitals (use
+	# any_system_within_border / closest_system checks)
+}
+
+# Where can it SPREAD?
+is_valid_astrophage_target = {
+	NOT = { has_star_flag = astrophage_infested }
+	NOT = { has_star_flag = astrophage_dead_system }
+	NOT = { has_star_flag = sealed_system }		# L-Cluster etc.
+	# Astrophage needs a star to feed on - exclude black holes etc.
+	any_system_planet = {
+		is_star = yes
+		# TODO: restrict/weight by star class - lore says it prefers
+		# bright stars. Check planet classes: pc_a_star, pc_f_star,
+		# pc_g_star, pc_k_star (weight down pc_m_star red dwarfs?)
+	}
+	# BALANCE TODO: systems inside empires with high containment
+	# situation progress should be immune or heavily resistant.
+	# Pattern: NOT = { exists = space_owner ... owner has flag
+	# astrophage_containment_active }
+}

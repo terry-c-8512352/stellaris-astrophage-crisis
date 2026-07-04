@@ -1,0 +1,34 @@
+# Galactic Community: "Joint Astrophage Research Program"
+# Passing it sets astrophage_gc_program_active, which doubles
+# situation progress for all GC members (see situations file).
+#
+# TODO: copy exact schema from vanilla common/resolutions/
+# (emergency measures / galactic priorities are good templates).
+# TODO: consider a second, harsher resolution: "Mandatory Containment
+# Levy" - taxes members energy monthly, boosts progress further, and
+# creates the political friction you wanted with non-cooperators
+# (breaching it = in_breach penalties, standard GC machinery).
+
+resolution_astrophage_research_program = {
+	icon = "GFX_resolution_type_galactic_reforms"
+	resolution_category = resolutions_emergency_measures	# TODO verify key
+	target = no
+
+	potential = {
+		has_global_flag = astrophage_gc_alerted
+		NOT = { has_global_flag = astrophage_crisis_resolved }
+	}
+
+	effect = {
+		set_global_flag = astrophage_gc_program_active
+		# TODO: fire notification event to all members
+	}
+
+	fail_effects = { }
+
+	ai_weight = {
+		base = 100
+		# TODO: AI empires with infested systems should weight this
+		# much higher; xenophobic isolationists lower.
+	}
+}

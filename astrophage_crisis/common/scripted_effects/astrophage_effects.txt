@@ -1,0 +1,72 @@
+# Scope expected: galactic_object (system) unless noted.
+
+# Mark a system as infested and start its dimming clock.
+astrophage_infest_system = {
+	set_star_flag = astrophage_infested
+	set_star_flag = astrophage_dim_0
+	# Dimming clock: store days-infested as a variable, incremented
+	# by the monthly pulse. Thresholds trigger stage events.
+	set_variable = {
+		which = astrophage_dim_progress
+		value = 0
+	}
+	# TODO: spawn a visual - candidate: system-wide ambient object or
+	# nebula-style fog (common/ambient_objects). MVP can skip visuals.
+	# TODO: notify owner if system is owned (country_event astrophage.20)
+}
+
+# Called every pulse for each infested system.
+astrophage_advance_dimming = {
+	change_variable = {
+		which = astrophage_dim_progress
+		value = 1
+	}
+	# Stage thresholds (in monthly pulses):
+	#   12 = stage 1 (~1 yr), 36 = stage 2, 72 = stage 3, 120 = dead
+	# TODO: make thresholds scale with galaxy settings / difficulty.
+	if = {
+		limit = {
+			check_variable = { which = astrophage_dim_progress value = 12 }
+			NOT = { has_star_flag = astrophage_dim_1 }
+		}
+		system_event = { id = astrophage.10 }
+	}
+	if = {
+		limit = {
+			check_variable = { which = astrophage_dim_progress value = 36 }
+			NOT = { has_star_flag = astrophage_dim_2 }
+		}
+		system_event = { id = astrophage.11 }
+	}
+	if = {
+		limit = {
+			check_variable = { which = astrophage_dim_progress value = 72 }
+			NOT = { has_star_flag = astrophage_dim_3 }
+		}
+		system_event = { id = astrophage.12 }
+	}
+	if = {
+		limit = {
+			check_variable = { which = astrophage_dim_progress value = 120 }
+			NOT = { has_star_flag = astrophage_dead_system }
+		}
+		system_event = { id = astrophage.13 }
+	}
+	# TODO: verify `system_event` fires correctly from system scope;
+	# alternative is inlining the stage effects here directly.
+}
+
+# Remove all astrophage effects from a system.
+astrophage_cleanse_system = {
+	remove_star_flag = astrophage_infested
+	remove_star_flag = astrophage_dim_0
+	remove_star_flag = astrophage_dim_1
+	remove_star_flag = astrophage_dim_2
+	remove_star_flag = astrophage_dim_3
+	remove_modifier = astrophage_dimming_1
+	remove_modifier = astrophage_dimming_2
+	remove_modifier = astrophage_dimming_3
+	# NOTE: dead systems (astrophage_dead_system) stay dead - the star
+	# is gone. Cleansing only saves systems still in stages 0-3.
+	# TODO: restore original star deposits if we swapped them.
+}

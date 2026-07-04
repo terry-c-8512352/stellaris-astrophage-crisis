@@ -1,0 +1,26 @@
+# The payoff toy: Hail Mary-style spin drive. Massive sublight speed
+# and evasion, costs sr_astrophage upkeep.
+# TODO: copy exact utility_component_template schema from vanilla
+# common/component_templates/00_utilities_thrusters.txt and add one
+# entry per ship size class (corvette/destroyer/etc.) as vanilla does.
+
+utility_component_template = {
+	key = "ASTROPHAGE_SPIN_DRIVE_1"
+	size = small
+	icon = "GFX_ship_part_thruster_4"	# TODO: custom icon
+	icon_frame = 1
+	power = -30
+	resources = {
+		category = ship_components
+		cost = { alloys = 30 sr_astrophage = 1 }
+		upkeep = { energy = 1 sr_astrophage = 0.05 }
+	}
+	modifier = {
+		ship_speed_mult = 0.6		# TODO: balance. Book-accurate would be absurd.
+		ship_evasion_add = 12
+	}
+	prerequisites = { "tech_astrophage_spin_drive" }
+	component_set = "thruster_components"
+	upgrades_to = none
+	ai_weight = { weight = 6 }
+}

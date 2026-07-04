@@ -1,0 +1,14 @@
+# Harvested astrophage: the densest fuel in the galaxy.
+# TODO: verify 4.4 resource definition fields against
+# common/strategic_resources/00_strategic_resources.txt in vanilla.
+
+sr_astrophage = {
+	category = rare
+	tradable = yes
+	market_amount = 0		# not on market until someone harvests it
+
+	ai_weight = { weight = 10 }
+
+	# TODO: custom icon (gfx/interface/icons/resources/sr_astrophage.dds)
+	# MVP: game may fall back to a placeholder icon; fine for testing.
+}

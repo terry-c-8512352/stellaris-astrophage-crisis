@@ -1,0 +1,40 @@
+# Event-granted techs (weight 0 = never in normal draw).
+# Granted by situation stages, not research card RNG.
+# TODO: verify tier/cost variables against vanilla 00_soc_tech.txt.
+
+tech_astrophage_containment = {
+	cost = 20000
+	area = society
+	tier = 4
+	category = { biology }
+	weight = 0
+	is_rare = yes
+	prerequisites = { }
+	# Granted at situation stage 3. Systems in your borders resist spread.
+	modifier = {
+		# TODO: consider country-level benefit, e.g. reduced spread chance
+	}
+}
+
+tech_astrophage_harvesting = {
+	cost = 25000
+	area = engineering
+	tier = 5
+	category = { voidcraft }
+	weight = 0
+	is_rare = yes
+	prerequisites = { tech_astrophage_containment }
+	# Granted on Harness path. Enables d_astrophage_bloom farming
+	# and unlocks the spin drive component.
+}
+
+tech_astrophage_spin_drive = {
+	cost = 30000
+	area = engineering
+	tier = 5
+	category = { propulsion }
+	weight = 0
+	is_rare = yes
+	prerequisites = { tech_astrophage_harvesting }
+	# Unlocks the Astrophage Spin Drive thruster (component_templates).
+}

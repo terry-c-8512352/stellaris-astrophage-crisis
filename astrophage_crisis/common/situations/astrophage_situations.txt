@@ -1,0 +1,71 @@
+# The core progression system: a per-empire situation tracking
+# astrophage research. Two speeds:
+#   - GC members with the emergency resolution passed: shared bonus
+#     to monthly progress (everyone's contributions lift all boats)
+#   - Isolationists: full cost, solo - slower but they keep exclusive
+#     rights to the Harness outcome in their space.
+#
+# TODO: this file is the least certain of the skeleton. Situations
+# have an exact schema - copy a vanilla file from common/situations/
+# (e.g. the deficit or Toxic God situations) and mirror its structure.
+
+astrophage_research_situation = {
+	# picture = GFX_evt_dying_star
+	category = neutral
+
+	stages = {
+		stage_1 = {	# Detection & Sampling
+			end = { custom_tooltip = astrophage_stage_1_end }
+		}
+		stage_2 = {	# Understanding the Breeding Loop
+		}
+		stage_3 = {	# Containment Protocols
+			# On reach: empire gains astrophage_containment_active flag
+			# -> their systems resist spread (see scripted_triggers)
+		}
+		stage_4 = {	# The Predator (fires astrophage.40 Taumoeba event)
+		}
+		stage_5 = {	# Resolution (choose ending path)
+		}
+	}
+
+	start_value = 0
+
+	monthly_progress = {
+		base = 1
+		# Cooperative bonus: GC resolution passed + member
+		modifier = {
+			factor = 2
+			has_global_flag = astrophage_gc_program_active
+			is_galactic_community_member = yes
+		}
+		# TODO: scale with empire monthly society research
+		# TODO: energy-contribution approach adds progress
+	}
+
+	approach = {
+		name = astrophage_approach_fund		# pour energy into research
+		resources = {
+			category = situations
+			cost = { energy = 10 }			# monthly upkeep. TODO: balance
+		}
+		modifier = { situation_monthly_change = 1 }
+		on_select = { }
+	}
+
+	approach = {
+		name = astrophage_approach_observe	# passive, no cost, slow
+		default = yes
+	}
+
+	approach = {
+		name = astrophage_approach_harness	# unlocked at stage 3+
+		# TODO: potential = { is on stage 3+ }
+		# Slower to finish but ends in astrophage.51 instead of .50
+	}
+
+	on_progress_complete = {
+		# Fired per stage or at 100%? Verify vanilla behavior.
+		# Final: fire astrophage.50 or .51 based on chosen approach.
+	}
+}
