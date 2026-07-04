@@ -25,10 +25,10 @@ Ground truth for valid triggers/effects/modifiers in 4.4 is the game's own dump 
 
 The mod is a chain of events, scripted effects/triggers, and flags spanning several files. The core loop:
 
-1. `common/on_actions/` hooks `on_game_start` → fires `astrophage.0` (setup) → schedules `astrophage.1` (outbreak).
-2. `astrophage.1` picks a seed system using scripted trigger `is_valid_astrophage_seed` (unclaimed space, never home systems) and applies scripted effect `astrophage_infest_system`, then starts `astrophage.2`.
-3. `astrophage.2` is a **self-rescheduling 30-day pulse** (`event = { id = astrophage.2 days = 30 }` inside its own `immediate`). Each pulse, every infested system advances its dimming clock (`astrophage_advance_dimming`) and rolls a 25% chance to infect a hyperlane neighbor (`is_valid_astrophage_target`). If this self-scheduling pattern fails validation, the documented fallback is `on_yearly_pulse` (see the TODO in `common/on_actions/`).
-4. Dimming progress is a per-system variable (`astrophage_dim_progress`, +1/pulse). Thresholds 12/36/72/120 fire events `astrophage.10–13`, which swap static modifiers `astrophage_dimming_1/2/3` and set star flags `astrophage_dim_1/2/3` / `astrophage_dead_system`.
+1. `common/on_actions/` hooks `on_game_start` → `astrophage.0` sets `astrophage_mod_active`, and `on_monthly_pulse` → `astrophage.2`, the crisis heartbeat. (There is no generic `event` *effect* in Stellaris, so events cannot self-schedule; both on_actions are no-scope.)
+2. Pre-outbreak, each `astrophage.2` pulse rolls a 4% monthly chance (once `mid_game_years_passed >= 0`) to fire scripted effect `astrophage_begin_outbreak`: picks a seed via scripted trigger `is_valid_astrophage_seed` (unclaimed space, never home systems) and applies `astrophage_infest_system`. `event astrophage.1` in the console forces the same effect for testing.
+3. Post-outbreak, each pulse every infested system advances its dimming clock (`astrophage_advance_dimming`) and rolls a 25% chance to infect a hyperlane neighbor (`is_valid_astrophage_target`).
+4. Dimming progress is a per-system variable (`astrophage_dim_progress`, +1/pulse). Thresholds 12/36/72/120 fire `system_event`s `astrophage.10–13` (they must be *declared* `system_event`, not `event`, to be fireable from system scope), which swap static modifiers `astrophage_dimming_1/2/3` and set star flags `astrophage_dim_1/2/3` / `astrophage_dead_system`.
 5. Discovery (`astrophage.20`) starts the per-empire Situation `astrophage_research_situation` (5 stages, 3 approaches: fund/observe/harness). Stage 4 fires the Taumoeba twist (`astrophage.40`); completion fires an ending — `astrophage.50` (Nullified, galaxy-wide cleanse) or `astrophage.51` (Harnessed, exclusive `sr_astrophage` farming).
 6. The GC resolution (`resolution_astrophage_research_program`) sets `astrophage_gc_program_active`, which the situation's `monthly_progress` reads to double member progress.
 

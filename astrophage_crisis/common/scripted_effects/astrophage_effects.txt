@@ -1,5 +1,17 @@
 # Scope expected: galactic_object (system) unless noted.
 
+# Start the crisis: pick a seed system and infest it.
+# No-scope; shared by astrophage.1 (console test) and the monthly
+# outbreak roll in astrophage.2.
+astrophage_begin_outbreak = {
+	set_global_flag = astrophage_outbreak_started
+	random_system = {
+		limit = { is_valid_astrophage_seed = yes }
+		astrophage_infest_system = yes
+		save_global_event_target_as = astrophage_patient_zero
+	}
+}
+
 # Mark a system as infested and start its dimming clock.
 astrophage_infest_system = {
 	set_star_flag = astrophage_infested

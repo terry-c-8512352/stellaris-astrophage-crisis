@@ -1,12 +1,10 @@
 # System-scope modifiers for dimming stages.
-# TODO: verify each modifier key against 4.4 modifier list
-# (Documents/.../logs/script_documentation or the wiki modifier page).
-# 4.x renamed several pop/job modifiers - do NOT trust 3.x tutorials.
+# Keys verified against 4.4 logs/script_documentation/modifiers.log.
 
 astrophage_dimming_1 = {
 	icon = "gfx/interface/icons/modifiers/mod_pop_environment_tolerance.dds"
 	icon_frame = 3	# red frame
-	planet_jobs_energy_produce_mult = -0.25
+	planet_jobs_energy_produces_mult = -0.25
 	# TODO: reduce star deposit output specifically (deposit swap may
 	# be cleaner than a jobs modifier - see deposits file)
 }
@@ -14,18 +12,18 @@ astrophage_dimming_1 = {
 astrophage_dimming_2 = {
 	icon = "gfx/interface/icons/modifiers/mod_pop_environment_tolerance.dds"
 	icon_frame = 3
-	planet_jobs_energy_produce_mult = -0.5
-	pop_environment_tolerance = -0.2	# TODO: confirm 4.4 habitability key
+	planet_jobs_energy_produces_mult = -0.5
+	pop_environment_tolerance = -0.2
 	planet_amenities_mult = -0.1
 }
 
 astrophage_dimming_3 = {
 	icon = "gfx/interface/icons/modifiers/mod_pop_environment_tolerance.dds"
 	icon_frame = 3
-	planet_jobs_energy_produce_mult = -0.75
+	planet_jobs_energy_produces_mult = -0.75
 	pop_environment_tolerance = -0.5
 	planet_amenities_mult = -0.25
-	pop_growth_speed = -0.75
+	logistic_growth_mult = -0.75
 	# Stage 3 = the death spiral. Colonies should be evacuating.
 	# TODO: add monthly devastation or pop decline via planet events
 	# if modifiers alone feel too gentle.

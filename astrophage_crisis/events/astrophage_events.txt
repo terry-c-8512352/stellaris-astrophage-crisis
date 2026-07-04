@@ -15,8 +15,9 @@
 namespace = astrophage
 
 # -------------------------------------------------------------
-# astrophage.0 - Setup at game start. Schedules the outbreak for
-# a random date in the midgame window.
+# astrophage.0 - Setup at game start. Outbreak timing is handled
+# by the monthly pulse (astrophage.2), which rolls for the
+# outbreak each month once the midgame window opens.
 # Fired from: on_game_start (see common/on_actions)
 # -------------------------------------------------------------
 event = {
@@ -27,18 +28,13 @@ event = {
 
 	immediate = {
 		set_global_flag = astrophage_mod_active
-		# TODO: replace fixed delay with random midgame timing.
-		# Pattern: random_list of delays, or check mid_game_start_year
-		# in the trigger of astrophage.1 and reschedule if too early.
-		event = {
-			id = astrophage.1
-			days = 18000	# ~50 years placeholder. TODO: randomize.
-		}
 	}
 }
 
 # -------------------------------------------------------------
 # astrophage.1 - The Outbreak. Picks a valid system and infests it.
+# Normally triggered by the monthly roll in astrophage.2; kept as
+# its own event so it can be forced for testing.
 # TEST IN CONSOLE WITH:  event astrophage.1
 # -------------------------------------------------------------
 event = {
@@ -48,21 +44,17 @@ event = {
 	is_triggered_only = yes
 
 	immediate = {
-		set_global_flag = astrophage_outbreak_started
-		random_system = {
-			limit = { is_valid_astrophage_seed = yes }	# scripted trigger
-			astrophage_infest_system = yes				# scripted effect
-			save_global_event_target_as = astrophage_patient_zero
-		}
-		# Begin the spread heartbeat
-		event = { id = astrophage.2 days = 30 }
+		astrophage_begin_outbreak = yes		# scripted effect
 	}
 }
 
 # -------------------------------------------------------------
-# astrophage.2 - Spread pulse. Runs every 30 days while any
-# infested system exists. Each infested system rolls a chance to
-# infect a hyperlane neighbor, and advances its own dimming clock.
+# astrophage.2 - Monthly pulse, fired from on_monthly_pulse
+# (no-scope, like on_game_start). Two phases:
+#   Pre-outbreak: once the midgame window opens, roll a monthly
+#     chance to start the outbreak (~2yr average delay).
+#   Post-outbreak: each infested system advances its dimming
+#     clock and rolls a chance to infect a hyperlane neighbor.
 #
 # BALANCE LEVER: spread_chance scales with total infested count
 # (breeding-loop pressure) and is reduced by containment progress.
@@ -73,34 +65,43 @@ event = {
 	is_triggered_only = yes
 
 	trigger = {
-		has_global_flag = astrophage_outbreak_started
+		has_global_flag = astrophage_mod_active
 		NOT = { has_global_flag = astrophage_crisis_resolved }
 	}
 
 	immediate = {
-		every_system = {
-			limit = { has_star_flag = astrophage_infested }
-			# 1) Advance this system's dimming stage
-			astrophage_advance_dimming = yes		# scripted effect
-
-			# 2) Attempt to spread to a neighbor
-			# TODO: gate on dimming stage >= 2 (a system must "bloom"
-			# before it exports spores, gives players reaction time)
+		if = {
+			limit = {
+				NOT = { has_global_flag = astrophage_outbreak_started }
+				mid_game_years_passed >= 0
+			}
+			# BALANCE LEVER: 4%/month = outbreak ~2 years into midgame
+			# on average, but unpredictable.
 			random_list = {
-				75 = { }	# no spread this pulse
-				25 = {
-					random_neighbor_system = {
-						limit = { is_valid_astrophage_target = yes }
-						astrophage_infest_system = yes
+				96 = { }
+				4 = { astrophage_begin_outbreak = yes }
+			}
+		}
+		else = {
+			every_system = {
+				limit = { has_star_flag = astrophage_infested }
+				# 1) Advance this system's dimming stage
+				astrophage_advance_dimming = yes		# scripted effect
+
+				# 2) Attempt to spread to a neighbor
+				# TODO: gate on dimming stage >= 2 (a system must "bloom"
+				# before it exports spores, gives players reaction time)
+				random_list = {
+					75 = { }	# no spread this pulse
+					25 = {
+						random_neighbor_system = {
+							limit = { is_valid_astrophage_target = yes }
+							astrophage_infest_system = yes
+						}
 					}
 				}
 			}
 		}
-		# Reschedule self
-		event = { id = astrophage.2 days = 30 }
-		# TODO: verify no-scope `event = { id = ... days = ... }`
-		# scheduling against vanilla (see nanite/gray goo events).
-		# Fallback pattern: mean_time_to_happen loop or on_yearly_pulse.
 	}
 }
 
@@ -110,7 +111,7 @@ event = {
 # Stage 1: -25% star output. Stage 2: -50%, habitability penalty.
 # Stage 3: -75%, pops begin dying / workforce collapse (4.x).
 # -------------------------------------------------------------
-event = {
+system_event = {
 	id = astrophage.10
 	hide_window = yes
 	is_triggered_only = yes
@@ -122,7 +123,7 @@ event = {
 	}
 }
 
-event = {
+system_event = {
 	id = astrophage.11
 	hide_window = yes
 	is_triggered_only = yes
@@ -134,7 +135,7 @@ event = {
 	}
 }
 
-event = {
+system_event = {
 	id = astrophage.12
 	hide_window = yes
 	is_triggered_only = yes
@@ -150,7 +151,7 @@ event = {
 }
 
 # astrophage.13 - System death (star fully consumed)
-event = {
+system_event = {
 	id = astrophage.13
 	hide_window = yes
 	is_triggered_only = yes

@@ -6,13 +6,17 @@ on_game_start = {
 	}
 }
 
+# Crisis heartbeat: outbreak roll + spread/dimming pulse.
+# on_monthly_pulse is no-scope (like on_game_start); astrophage.2
+# gates itself via its trigger block.
+on_monthly_pulse = {
+	events = {
+		astrophage.2
+	}
+}
+
 # TODO (discovery wiring): fire astrophage.20 for an empire when its
 # science ship enters / surveys an infested system. Candidate hooks:
 #   on_entering_system, on_survey
 # Both scope to the fleet/country - check vanilla 00_on_actions.txt
 # for exact scopes before wiring.
-#
-# TODO (fallback heartbeat): if the self-rescheduling `event = { }`
-# pattern in astrophage.2 fails validation, replace with:
-# on_yearly_pulse = { events = { astrophage.2 } }
-# and change internal reschedule to 12 pulses/yr equivalent balance.
